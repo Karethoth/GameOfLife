@@ -26,10 +26,12 @@ CONFIG += c++17
 
 SOURCES += \
     src/main.cpp \
-    src/mainwindow.cpp
+    src/mainwindow.cpp \
+    src/lifegrid.cpp
 
 HEADERS += \
-    src/mainwindow.h
+    src/mainwindow.h \
+    src/lifegrid.h
 
 FORMS += \
         ui/mainwindow.ui
