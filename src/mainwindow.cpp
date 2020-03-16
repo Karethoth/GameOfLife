@@ -2,7 +2,6 @@
 #include "ui_mainwindow.h"
 
 #include <QLayout>
-#include <QHBoxLayout>
 #include <QGraphicsView>
 #include <QGraphicsScene>
 
@@ -14,13 +13,16 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Create the canvas
     graphics_view = std::make_unique<QGraphicsView>(this);
-    auto hbox = new QHBoxLayout(this);
+    hbox_layout = std::make_unique<QHBoxLayout>(this);
 
-    hbox->addWidget(graphics_view.get());
+    hbox_layout->addWidget(graphics_view.get());
 
     auto contentWidget = new QWidget();
-    contentWidget->setLayout(hbox);
+    contentWidget->setLayout(hbox_layout.get());
     setCentralWidget(contentWidget);
+
+    life_grid = std::make_unique<LifeGrid>(this);
+    graphics_view->setScene(life_grid.get());
 
 
     // Ensure painting is toggled on by default
@@ -42,10 +44,6 @@ MainWindow::MainWindow(QWidget *parent) :
         this->on_speed_changed(i);
     });
 
-    auto brush = QBrush(QColor(255,0,0,127),Qt::BrushStyle::SolidPattern);
-
-    life_grid = std::make_unique<LifeGrid>(this);
-    graphics_view->setScene(life_grid.get());
     ui->mainToolBar->addWidget(speed_selector.get());
 }
 
