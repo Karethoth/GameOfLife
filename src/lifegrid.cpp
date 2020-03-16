@@ -4,6 +4,8 @@
 #include <type_traits>
 
 #include <QPainter>
+#include <QGraphicsSceneMouseEvent>
+#include <QGraphicsSceneWheelEvent>
 
 
 // Helper for the float to int casting
@@ -19,12 +21,14 @@ int to_int(T f)
 
 LifeGrid::LifeGrid(QObject *_parent) :
     QGraphicsScene(_parent),
-    cells{10 * 10, DEAD},
     zoom{20},
     offset_x{0.f},
     offset_y{0.f},
     grid_width{10},
-    grid_height{10}
+    grid_height{10},
+    cells{10 * 10, DEAD},
+    paint_mode{MAKE_ALIVE},
+    is_dragging_view{false}
 {
     resize_grid(5, 5);
     create_glider();
@@ -34,7 +38,7 @@ LifeGrid::~LifeGrid()
 {
 }
 
-size_t LifeGrid::coord_to_index(int x, int y)
+size_t LifeGrid::coord_to_index(int x, int y) const
 {
     if(x >= grid_width) {
         x = grid_width - 1;
@@ -83,9 +87,46 @@ void LifeGrid::resize_grid(int new_width, int new_height)
 void LifeGrid::set_cell(const int x, const int y, const CELL state)
 {
     size_t index = coord_to_index(x, y);
-    std::cout << "Coord: " << x << ',' << y << ": " << index << std::endl;
-    std::cout << "cells: " << cells.size() << std::endl;
     cells[index] = state;
+}
+
+CELL LifeGrid::get_cell(const int x, const int y) const
+{
+    // TODO: if outside of bounds, display error in status
+    size_t index = coord_to_index(x, y);
+    return cells[index];
+}
+
+QPoint LifeGrid::scene_pos_to_grid_pos(const QPointF &scene_pos) const
+{
+    const float grid_total_width = this->grid_width * this->zoom;
+    const float grid_total_height = this->grid_height * this->zoom;
+
+    const float min_x = 0.f - grid_total_width  / 2.f + offset_x;
+    const float min_y = 0.f - grid_total_height / 2.f + offset_y;
+
+    const float max_x = grid_total_width / 2.f + offset_x;
+    const float max_y = grid_total_height / 2.f + offset_y;
+
+    const float cell_width  = (max_x - min_x) / grid_width;
+    const float cell_height = (max_y - min_y) / grid_height;
+
+    const float scene_x = static_cast<float>(scene_pos.x());
+    const float scene_y = static_cast<float>(scene_pos.y());
+
+    float grid_x = (scene_x - min_x) / cell_width;
+    float grid_y = (scene_y - min_y) / cell_height;
+
+    if (grid_x < 0.f)
+    {
+        grid_x += -1.f;
+    }
+    if (grid_y < 0.f)
+    {
+        grid_y += -1.f;
+    }
+
+    return QPoint(to_int(grid_x), to_int(grid_y));
 }
 
 /*
@@ -116,9 +157,94 @@ void LifeGrid::drawForeground(QPainter *painter, const QRectF &rect)
     draw_grid(painter);
 }
 
+void LifeGrid::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+{
+    if(event->button() == Qt::MouseButton::LeftButton)
+    {
+        const auto pos = scene_pos_to_grid_pos(event->scenePos());
+        const bool is_valid = pos.x() >= 0 && pos.x() < grid_width &&
+                              pos.y() >= 0 && pos.y() < grid_height;
+        if(!is_valid)
+        {
+            return;
+        }
+
+        const auto cell = get_cell(pos.x(), pos.y());
+        const auto target_state = paint_mode == MAKE_ALIVE ? ALIVE : DEAD;
+        if(cell == target_state)
+        {
+            return;
+        }
+
+        set_cell(pos.x(), pos.y(), target_state);
+        this->update();
+    }
+
+    if(is_dragging_view)
+    {
+        const auto position_diff = event->scenePos() - event->lastScenePos();
+        offset_x += static_cast<float>(position_diff.x());
+        offset_y += static_cast<float>(position_diff.y());
+        this->update();
+    }
+
+}
+
+void LifeGrid::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    if(event->button() == Qt::LeftButton)
+    {
+        const auto pos = scene_pos_to_grid_pos(event->scenePos());
+        const bool is_valid = pos.x() >= 0 && pos.x() < grid_width &&
+                              pos.y() >= 0 && pos.y() < grid_height;
+        if(!is_valid)
+        {
+            return;
+        }
+
+        const auto cell = get_cell(pos.x(), pos.y());
+        const auto target_state = cell == ALIVE ? DEAD : ALIVE;
+        paint_mode = target_state == ALIVE ? MAKE_ALIVE : MAKE_DEAD;
+        set_cell(pos.x(), pos.y(), target_state);
+
+        this->update();
+    }
+    else if(event->button() == Qt::MouseButton::RightButton)
+    {
+        is_dragging_view = true;
+    }
+}
+
+void LifeGrid::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    if(event->button() == Qt::MouseButton::RightButton)
+    {
+        is_dragging_view = false;
+    }
+}
+
+void LifeGrid::wheelEvent(QGraphicsSceneWheelEvent *event)
+{
+    zoom += event->delta() / 20.f;
+    if(zoom < 2)
+    {
+        zoom = 2;
+    }
+    else if(zoom > 100)
+    {
+        zoom = 100;
+    }
+
+    // TODO: Center around hovered position
+    this->update();
+
+}
+
 void LifeGrid::draw_grid(QPainter *painter) const
 {
     painter->setPen(QPen(Qt::black));
+
+    // TODO: Only render the visible portion of the grid
 
     const float grid_total_width = this->grid_width * this->zoom;
     const float grid_total_height = this->grid_height * this->zoom;
