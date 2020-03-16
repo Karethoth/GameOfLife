@@ -159,7 +159,7 @@ void LifeGrid::drawForeground(QPainter *painter, const QRectF &rect)
 
 void LifeGrid::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    if(event->button() == Qt::MouseButton::LeftButton)
+    if(is_painting_cells)
     {
         const auto pos = scene_pos_to_grid_pos(event->scenePos());
         const bool is_valid = pos.x() >= 0 && pos.x() < grid_width &&
@@ -202,6 +202,8 @@ void LifeGrid::mousePressEvent(QGraphicsSceneMouseEvent *event)
             return;
         }
 
+        is_painting_cells = true;
+
         const auto cell = get_cell(pos.x(), pos.y());
         const auto target_state = cell == ALIVE ? DEAD : ALIVE;
         paint_mode = target_state == ALIVE ? MAKE_ALIVE : MAKE_DEAD;
@@ -217,7 +219,11 @@ void LifeGrid::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void LifeGrid::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    if(event->button() == Qt::MouseButton::RightButton)
+    if(event->button() == Qt::MouseButton::LeftButton)
+    {
+        is_painting_cells = false;
+    }
+    else if(event->button() == Qt::MouseButton::RightButton)
     {
         is_dragging_view = false;
     }

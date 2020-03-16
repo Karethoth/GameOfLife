@@ -52,6 +52,7 @@ class LifeGrid : public QGraphicsScene
 
     std::vector<CELL> cells;
     PaintMode paint_mode;
+    bool is_painting_cells;
     bool is_dragging_view;
 };
 
