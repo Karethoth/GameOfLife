@@ -19,12 +19,12 @@ int to_int(T f)
     return static_cast<int>(f);
 }
 
-LifeGrid::LifeGrid() :
-    grid_width{10},
-    grid_height{10},
-    cells{10 * 10, DEAD}
+LifeGrid::LifeGrid(int size_n) :
+    grid_width{size_n},
+    grid_height{size_n}
 {
-    resize_grid(10, 10);
+    cells = std::vector<CELL>(size_n*size_n, DEAD);
+    resize_grid(size_n, size_n);
 }
 
 LifeGrid::~LifeGrid()
@@ -156,16 +156,14 @@ void LifeGrid::next_generation()
         // If we're not on the bottom row, we can grab the cells from the row below
         if(y < grid_height - 1)
         {
-            const auto cell1 = get_cell(0, y+1);
-            const auto cell2 = get_cell(1, y+1);
             current_kernel.cells[7] = get_cell(0, y+1);
             current_kernel.cells[8] = get_cell(1, y+1);
         }
 
         for(int x=0; x < grid_width; x++)
         {
-            // If this isn't the rightmost column of the grid fill
-            // the rigt kernel column, pretty much the same as above
+            // If this isn't the rightmost column of the grid, fill
+            // the rigt kernel column. Pretty much the same as above
             if(x < grid_width - 1)
             {
                 if(y > 0)

@@ -28,3 +28,22 @@ make
 ```
 
 Alternatively you can just open the project file in Qt Creator and use that.
+
+### Creating documentation
+#### Install doxygen (and graphviz for the sweet graphs)
+```
+sudo apt install 
+sudo apt install graphviz
+```
+
+#### Run doxygen
+```
+doxygen doxygen.conf
+```
+
+## The directory structure
+- `src/` All of the code, excluding the tests.
+- `tests/` The tests.
+- `ui/` The main window Qt5 form can be found here.
+- `doc/` The documentation, generated when doxygen is run
+- `build/` The build directory
