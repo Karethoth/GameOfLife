@@ -1,9 +1,12 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "ui/resizedialog.h"
 
 #include <QLayout>
 #include <QGraphicsView>
 #include <QGraphicsScene>
+
+#include <iostream>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -92,4 +95,26 @@ void MainWindow::on_actionClear_triggered()
 void MainWindow::on_actionTogglePaint_toggled(bool arg1)
 {
     life_grid_scene->toggle_painting_enabled(arg1);
+}
+
+void MainWindow::on_actionResize_triggered()
+{
+    resize_dialog = std::make_unique<ResizeDialog>(
+                this,
+                life_grid_scene->get_grid_width(),
+                life_grid_scene->get_grid_height()
+    );
+
+    QObject::connect(resize_dialog.get(), &QDialog::accepted, this, &MainWindow::on_resize_dialog_accepted);
+
+    resize_dialog->show();
+}
+
+void MainWindow::on_resize_dialog_accepted()
+{
+    life_grid_scene->resize_grid(
+        resize_dialog->new_width,
+        resize_dialog->new_height
+    );
+    life_grid_scene->update();
 }

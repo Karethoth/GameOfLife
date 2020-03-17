@@ -65,6 +65,18 @@ class LifeGrid
      */
     void set_wrap_grid(bool wrap);
 
+    /*!
+     * \brief Grab grid width
+     * \return Current grid width
+     */
+    int get_grid_width() const;
+
+    /*!
+     * \brief Grab grid height
+     * \return Current grid height
+     */
+    int get_grid_height() const;
+
   protected:
     /*!
      * \brief Calculates the real index for the given coordinate

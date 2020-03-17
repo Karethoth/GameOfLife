@@ -30,16 +30,19 @@ SOURCES += \
     src/mainwindow.cpp \
     src/cellkernel.cpp \
     src/lifegridscene.cpp \
-    src/lifegrid.cpp
+    src/lifegrid.cpp \
+    ui/resizedialog.cpp
 
 HEADERS += \
     src/mainwindow.h \
     src/cellkernel.h \
     src/lifegridscene.h \
-    src/lifegrid.h
+    src/lifegrid.h \
+    ui/resizedialog.h
 
 FORMS += \
-        ui/mainwindow.ui
+        ui/mainwindow.ui \
+    ui/resizedialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -9,6 +9,7 @@
 #include <memory>
 
 #include "lifegridscene.h"
+#include "ui/resizedialog.h"
 
 namespace Ui {
 class MainWindow;
@@ -37,6 +38,10 @@ private slots:
 
     void on_actionTogglePaint_toggled(bool arg1);
 
+    void on_actionResize_triggered();
+
+    void on_resize_dialog_accepted();
+
 private:
     Ui::MainWindow *ui;
 
@@ -44,6 +49,7 @@ private:
     std::unique_ptr<QHBoxLayout> hbox_layout;
     std::unique_ptr<QSpinBox> speed_selector;
     std::unique_ptr<LifeGridScene> life_grid_scene;
+    std::unique_ptr<ResizeDialog> resize_dialog;
 
     void on_speed_changed(int i);
 };

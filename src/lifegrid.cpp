@@ -260,3 +260,13 @@ void LifeGrid::set_wrap_grid(bool wrap)
 {
     wrap_grid = wrap;
 }
+
+int LifeGrid::get_grid_width() const
+{
+    return grid_width;
+}
+
+int LifeGrid::get_grid_height() const
+{
+    return grid_height;
+}
