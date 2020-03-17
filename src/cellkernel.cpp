@@ -2,6 +2,13 @@
 
 #include <numeric>
 
+CellKernel::CellKernel(CELL state_for_all) : cells{state_for_all}
+{
+}
+CellKernel::CellKernel( std::array<CELL,9> initial_cells ) : cells(initial_cells)
+{
+}
+
 void CellKernel::step_right()
 {
     /*
@@ -30,7 +37,7 @@ CELL CellKernel::compute_state()
     // Calculate the total number of cells alive.
     // To account for the current state, start from -1 if the cell is alive at the moment
     int initial_neighbours= current_state == ALIVE ? -1 : 0;
-    const auto neighbours = std::accumulate(cells, cells+9, initial_neighbours);
+    const auto neighbours = std::accumulate(cells.begin(), cells.end(), initial_neighbours);
 
     if (current_state == ALIVE)
     {
