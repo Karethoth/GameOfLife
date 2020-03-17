@@ -69,7 +69,8 @@ void MainWindow::on_speed_changed(int i)
 
 void MainWindow::on_actionStep_triggered()
 {
-    life_grid_scene->step_and_update();
+    life_grid_scene->next_generation();
+    life_grid_scene->update();
 }
 
 void MainWindow::on_actionRun_toggled(bool arg1)
@@ -86,4 +87,9 @@ void MainWindow::on_actionClear_triggered()
 {
     life_grid_scene->clear_grid();
     life_grid_scene->update();
+}
+
+void MainWindow::on_actionTogglePaint_toggled(bool arg1)
+{
+    life_grid_scene->toggle_painting_enabled(arg1);
 }

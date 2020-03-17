@@ -29,7 +29,8 @@ LifeGridScene::LifeGridScene(QObject *_parent) :
     paint_mode{MAKE_ALIVE},
     is_dragging_view{false},
     speed{1},
-    is_running{false}
+    is_running{false},
+    is_painting_enabled{true}
 {
     resize_grid(10,10);
     create_glider();
@@ -37,12 +38,6 @@ LifeGridScene::LifeGridScene(QObject *_parent) :
 
 LifeGridScene::~LifeGridScene()
 {
-}
-
-void LifeGridScene::step_and_update()
-{
-    this->next_generation();
-    this->update();
 }
 
 QPoint LifeGridScene::scene_pos_to_grid_pos(const QPointF &scene_pos) const
@@ -88,7 +83,8 @@ void LifeGridScene::run(bool run)
         {
             while(this->is_running)
             {
-                this->step_and_update();
+                this->next_generation();
+                this->update();
 
                 const auto delay = std::chrono::milliseconds( 1000 / this->speed);
                 std::this_thread::sleep_for(std::chrono::milliseconds(delay));
@@ -112,6 +108,11 @@ void LifeGridScene::stop_and_wait_for_thread()
 void LifeGridScene::set_speed(int updates_per_second)
 {
     speed = updates_per_second;
+}
+
+void LifeGridScene::toggle_painting_enabled(bool enabled)
+{
+    is_painting_enabled = enabled;
 }
 
 void LifeGridScene::drawForeground(QPainter *painter, const QRectF &rect)
@@ -159,7 +160,7 @@ void LifeGridScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
         const auto pos = scene_pos_to_grid_pos(event->scenePos());
         const bool is_valid = pos.x() >= 0 && pos.x() < grid_width &&
                               pos.y() >= 0 && pos.y() < grid_height;
-        if(!is_valid)
+        if(!is_valid || !is_painting_enabled)
         {
             return;
         }

@@ -35,6 +35,8 @@ private slots:
 
     void on_actionClear_triggered();
 
+    void on_actionTogglePaint_toggled(bool arg1);
+
 private:
     Ui::MainWindow *ui;
 

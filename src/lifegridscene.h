@@ -55,11 +55,6 @@ class LifeGridScene : public LifeGrid, public QGraphicsScene
     void wheelEvent(QGraphicsSceneWheelEvent *event) override;
 
     /*!
-     * \brief Forces the generation of the new state and redraws the grid
-     */
-    void step_and_update();
-
-    /*!
      * \brief Called when exiting
      * \details Will return only after update_thread is stopped if the simulation is running
      */
@@ -70,6 +65,13 @@ class LifeGridScene : public LifeGrid, public QGraphicsScene
      * \param updates_per_second How many times in a second should we step
      */
     void set_speed(int updates_per_second);
+
+
+    /*!
+     * \brief Is painting enabled
+     * \param enabled Can the user paint?
+     */
+    void toggle_painting_enabled(bool enabled);
 
   private:
     /*!
@@ -117,6 +119,12 @@ class LifeGridScene : public LifeGrid, public QGraphicsScene
      * \brief The update thread, used when the simulation is running on its own
      */
     std::thread update_thread;
+
+
+    /*!
+     * \brief Can the user paint cells?
+     */
+    bool is_painting_enabled;
 };
 
 #endif // LIFEGRIDSCENE_H
