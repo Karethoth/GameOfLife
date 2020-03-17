@@ -22,10 +22,18 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    void closeEvent(QCloseEvent *event) override;
+
 private slots:
     void on_actionExit_triggered();
 
     void on_actionStep_triggered();
+
+    void on_actionRun_toggled(bool arg1);
+
+    void on_actionWrap_Grid_toggled(bool arg1);
+
+    void on_actionClear_triggered();
 
 private:
     Ui::MainWindow *ui;

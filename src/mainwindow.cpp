@@ -38,7 +38,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // Create the speed selector with the initial value and connect it back
     // and connect it back
     speed_selector = std::make_unique<QSpinBox>();
-    speed_selector->setRange(0, 100);
+    speed_selector->setRange(1, 100);
     speed_selector->setValue(1);
     speed_selector->connect(speed_selector.get(), static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [=](int i) {
         this->on_speed_changed(i);
@@ -52,6 +52,11 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    life_grid_scene->stop_and_wait_for_thread();
+}
+
 void MainWindow::on_actionExit_triggered()
 {
     this->close();
@@ -59,10 +64,26 @@ void MainWindow::on_actionExit_triggered()
 
 void MainWindow::on_speed_changed(int i)
 {
-    QString str = QString::number(i);
+    life_grid_scene->set_speed(i);
 }
 
 void MainWindow::on_actionStep_triggered()
 {
     life_grid_scene->step_and_update();
+}
+
+void MainWindow::on_actionRun_toggled(bool arg1)
+{
+    life_grid_scene->run(arg1);
+}
+
+void MainWindow::on_actionWrap_Grid_toggled(bool arg1)
+{
+    life_grid_scene->set_wrap_grid(arg1);
+}
+
+void MainWindow::on_actionClear_triggered()
+{
+    life_grid_scene->clear_grid();
+    life_grid_scene->update();
 }

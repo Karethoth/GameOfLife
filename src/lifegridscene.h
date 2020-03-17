@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <vector>
+#include <thread>
 
 
 /*!
@@ -45,6 +46,8 @@ class LifeGridScene : public LifeGrid, public QGraphicsScene
      */
     float offset_y;
 
+    void run(bool run);
+
     void drawForeground(QPainter *painter, const QRectF &rect) override;
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
@@ -55,6 +58,18 @@ class LifeGridScene : public LifeGrid, public QGraphicsScene
      * \brief Forces the generation of the new state and redraws the grid
      */
     void step_and_update();
+
+    /*!
+     * \brief Called when exiting
+     * \details Will return only after update_thread is stopped if the simulation is running
+     */
+    void stop_and_wait_for_thread();
+
+    /*!
+     * \brief Set the simulation speed
+     * \param updates_per_second How many times in a second should we step
+     */
+    void set_speed(int updates_per_second);
 
   private:
     /*!
@@ -87,6 +102,21 @@ class LifeGridScene : public LifeGrid, public QGraphicsScene
      * \details True when the user drags mouse around the grid, while holding the right mouse button down
      */
     bool is_dragging_view;
+
+    /*!
+     * \brief Simulation speed. Updates per second.
+     */
+    int speed;
+
+    /*!
+     * \brief Is the simulation running?
+     */
+    bool is_running;
+
+    /*!
+     * \brief The update thread, used when the simulation is running on its own
+     */
+    std::thread update_thread;
 };
 
 #endif // LIFEGRIDSCENE_H

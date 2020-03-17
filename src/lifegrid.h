@@ -21,6 +21,11 @@ class LifeGrid
     virtual ~LifeGrid();
 
     /*!
+     * \brief Kills all cells in the grid
+     */
+    void clear_grid();
+
+    /*!
      * \brief Resizes the grid
      * \param new_width The new width of the grid
      * \param new_height The new height of the grid
@@ -47,11 +52,18 @@ class LifeGrid
 
     /*!
      * \brief Fetch the state of a certain cell
+     * \details Will wrap coordinates around as necessary to keep them in-bounds
      * \param x The wanted column. The 1st column is 0
      * \param y The wanted row. The 1st row is 0
      * \return
      */
-    CELL get_cell(const int x, const int y) const;
+    CELL get_cell(int x, int y) const;
+
+    /*!
+     * \brief Set grid wrap
+     * \param wrap Should the grid wrap around itself?
+     */
+    void set_wrap_grid(bool wrap);
 
   protected:
     /*!
@@ -92,6 +104,11 @@ class LifeGrid
      * \param state The wanted state of the cell.
      */
     void set_next_generation_cell(const int x, const int y, const CELL state);
+
+    /*!
+     * \brief Should the grid wrap around itself?
+     */
+    bool wrap_grid;
 };
 
 #endif // LIFEGRID_H

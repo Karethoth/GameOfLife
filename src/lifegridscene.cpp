@@ -3,6 +3,8 @@
 #include <iostream>
 #include <numeric>
 #include <type_traits>
+#include <thread>
+#include <chrono>
 
 #include <QPainter>
 #include <QGraphicsSceneMouseEvent>
@@ -25,9 +27,11 @@ LifeGridScene::LifeGridScene(QObject *_parent) :
     offset_x{0.f},
     offset_y{0.f},
     paint_mode{MAKE_ALIVE},
-    is_dragging_view{false}
+    is_dragging_view{false},
+    speed{1},
+    is_running{false}
 {
-    resize_grid(15,15);
+    resize_grid(10,10);
     create_glider();
 }
 
@@ -72,6 +76,42 @@ QPoint LifeGridScene::scene_pos_to_grid_pos(const QPointF &scene_pos) const
     }
 
     return QPoint(to_int(grid_x), to_int(grid_y));
+}
+
+void LifeGridScene::run(bool run)
+{
+    is_running = run;
+
+    if(is_running)
+    {
+        update_thread = std::thread([&]()
+        {
+            while(this->is_running)
+            {
+                this->step_and_update();
+
+                const auto delay = std::chrono::milliseconds( 1000 / this->speed);
+                std::this_thread::sleep_for(std::chrono::milliseconds(delay));
+            }
+        });
+    }
+    else {
+        update_thread.join();
+    }
+}
+
+void LifeGridScene::stop_and_wait_for_thread()
+{
+    if(update_thread.joinable())
+    {
+        is_running = false;
+        update_thread.join();
+    }
+}
+
+void LifeGridScene::set_speed(int updates_per_second)
+{
+    speed = updates_per_second;
 }
 
 void LifeGridScene::drawForeground(QPainter *painter, const QRectF &rect)

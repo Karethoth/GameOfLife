@@ -13,8 +13,7 @@ enum CELL : unsigned char
 };
 
 /*!
- *  \brief 3x3 matrix. Encapsulates current cell and all of its neighbours.
- *  \details Provides common methods step_right() and compute_state()
+ *  \brief 3x3 matrix. Encapsulates the current cell and all of its neighbours.
  */
 struct CellKernel
 {

@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Game of Life</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <property name="sizePolicy">
@@ -51,7 +51,15 @@
     </property>
     <addaction name="actionExit"/>
    </widget>
+   <widget class="QMenu" name="menuGrid">
+    <property name="title">
+     <string>Grid</string>
+    </property>
+    <addaction name="actionResize"/>
+    <addaction name="actionClear"/>
+   </widget>
    <addaction name="menuGame_of_Life"/>
+   <addaction name="menuGrid"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -61,7 +69,10 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionTogglePaint"/>
+   <addaction name="actionWrap_Grid"/>
+   <addaction name="separator"/>
    <addaction name="actionStep"/>
+   <addaction name="actionRun"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionExit">
@@ -83,6 +94,38 @@
   <action name="actionStep">
    <property name="text">
     <string>Step</string>
+   </property>
+  </action>
+  <action name="actionResize">
+   <property name="text">
+    <string>Resize</string>
+   </property>
+  </action>
+  <action name="actionClear">
+   <property name="text">
+    <string>Clear</string>
+   </property>
+  </action>
+  <action name="actionRun">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>▶ </string>
+   </property>
+   <property name="toolTip">
+    <string>Run</string>
+   </property>
+  </action>
+  <action name="actionWrap_Grid">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Wrap Grid</string>
+   </property>
+   <property name="toolTip">
+    <string>Wrap the grid around itself</string>
    </property>
   </action>
  </widget>
