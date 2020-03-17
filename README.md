@@ -2,7 +2,7 @@
 *Simple Game of Life for Qt5 with a small twist*
 
 ## The twist
-*Instead of the usual "fetch all neighbours around a cell" this implementation drags a 3x3 matrix around the grid*
+*Instead of the usual "fetch all neighbours around a cell", this implementation drags a 3x3 matrix around the grid*
 
 ## Requirements
 - Basic C++ build tools
