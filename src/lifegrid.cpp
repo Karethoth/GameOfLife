@@ -33,15 +33,18 @@ LifeGrid::~LifeGrid()
 
 size_t LifeGrid::coord_to_index(int x, int y) const
 {
-    if(x >= grid_width) {
+    if(x >= grid_width)
+    {
         x = grid_width - 1;
     }
 
-    if(y >= grid_height) {
+    if(y >= grid_height)
+    {
         y = grid_height - 1;
     }
 
-    if(x < 0 || y < 0) {
+    if(x < 0 || y < 0)
+    {
         return 0;
     }
 
@@ -51,10 +54,12 @@ size_t LifeGrid::coord_to_index(int x, int y) const
 
 void LifeGrid::resize_grid(int new_width, int new_height)
 {
-    if(new_width <= 0) {
+    if(new_width <= 0)
+    {
         new_width = 1;
     }
-    if(new_height <= 0) {
+    if(new_height <= 0)
+    {
         new_height = 1;
     }
 
@@ -121,44 +126,48 @@ void LifeGrid::create_glider()
 
 void LifeGrid::next_generation()
 {
-    cells_next_generation.reserve(cells.size());
+    cells_next_generation.resize(cells.size());
 
     /* Kernel we will be updating as the grid is traversed through
      * 0 1 2
      * 3 4 5
      * 6 7 8
      */
-    CellKernel current_kernel{DEAD};
 
     // TODO: Handle special cases for grid sizes smaller than 3x3
 
+    int index = 0;
     for(int y=0; y < grid_height; y++)
     {
+        CellKernel current_kernel{DEAD};
         // We know that the left column is dead, so there is no need to populate it.
         // (Unless we want to wrap the grid around.)
 
         // If we're not on the top-row, we can grab the cells from the row above
         if(y > 0)
         {
-            current_kernel.cells[1] = get_cell(1, y-1);
-            current_kernel.cells[2] = get_cell(2, y-1);
+            current_kernel.cells[1] = get_cell(0, y-1);
+            current_kernel.cells[2] = get_cell(1, y-1);
         }
 
-        current_kernel.cells[4] = get_cell(1, y);
-        current_kernel.cells[5] = get_cell(2, y);
+        current_kernel.cells[4] = get_cell(0, y);
+        current_kernel.cells[5] = get_cell(1, y);
 
         // If we're not on the bottom row, we can grab the cells from the row below
         if(y < grid_height - 1)
         {
-            current_kernel.cells[7] = get_cell(1, y+1);
-            current_kernel.cells[8] = get_cell(2, y+1);
+            const auto cell1 = get_cell(0, y+1);
+            const auto cell2 = get_cell(1, y+1);
+            current_kernel.cells[7] = get_cell(0, y+1);
+            current_kernel.cells[8] = get_cell(1, y+1);
         }
 
         for(int x=0; x < grid_width; x++)
         {
             // If this isn't the rightmost column of the grid fill
             // the rigt kernel column, pretty much the same as above
-            if(x < grid_width - 1) {
+            if(x < grid_width - 1)
+            {
                 if(y > 0)
                 {
                     current_kernel.cells[2] = get_cell(x+1, y-1);
@@ -173,10 +182,13 @@ void LifeGrid::next_generation()
             }
 
             // Update the next generation
-            set_next_generation_cell(x, y, current_kernel.compute_state());
+            const auto new_state = current_kernel.compute_state();
+            set_next_generation_cell(x, y, new_state);
 
             // Move kernel contents left by one
             current_kernel.step_right();
+
+            index++;
         }
     }
     cells = cells_next_generation;

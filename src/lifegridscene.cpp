@@ -27,7 +27,7 @@ LifeGridScene::LifeGridScene(QObject *_parent) :
     paint_mode{MAKE_ALIVE},
     is_dragging_view{false}
 {
-    resize_grid(5,5);
+    resize_grid(15,15);
     create_glider();
 }
 
