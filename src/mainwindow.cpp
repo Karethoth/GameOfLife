@@ -21,8 +21,8 @@ MainWindow::MainWindow(QWidget *parent) :
     contentWidget->setLayout(hbox_layout.get());
     setCentralWidget(contentWidget);
 
-    life_grid = std::make_unique<LifeGrid>(this);
-    graphics_view->setScene(life_grid.get());
+    life_grid_scene = std::make_unique<LifeGridScene>(this);
+    graphics_view->setScene(life_grid_scene.get());
 
 
     // Ensure painting is toggled on by default

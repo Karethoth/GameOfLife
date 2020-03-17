@@ -1,6 +1,7 @@
 #include "lifegrid.h"
 
 #include <iostream>
+#include <numeric>
 #include <type_traits>
 
 #include <QPainter>
@@ -18,20 +19,12 @@ int to_int(T f)
     return static_cast<int>(f);
 }
 
-
-LifeGrid::LifeGrid(QObject *_parent) :
-    QGraphicsScene(_parent),
-    zoom{20},
-    offset_x{0.f},
-    offset_y{0.f},
+LifeGrid::LifeGrid() :
     grid_width{10},
     grid_height{10},
-    cells{10 * 10, DEAD},
-    paint_mode{MAKE_ALIVE},
-    is_dragging_view{false}
+    cells{10 * 10, DEAD}
 {
-    resize_grid(5, 5);
-    create_glider();
+    resize_grid(10, 10);
 }
 
 LifeGrid::~LifeGrid()
@@ -97,38 +90,6 @@ CELL LifeGrid::get_cell(const int x, const int y) const
     return cells[index];
 }
 
-QPoint LifeGrid::scene_pos_to_grid_pos(const QPointF &scene_pos) const
-{
-    const float grid_total_width = this->grid_width * this->zoom;
-    const float grid_total_height = this->grid_height * this->zoom;
-
-    const float min_x = 0.f - grid_total_width  / 2.f + offset_x;
-    const float min_y = 0.f - grid_total_height / 2.f + offset_y;
-
-    const float max_x = grid_total_width / 2.f + offset_x;
-    const float max_y = grid_total_height / 2.f + offset_y;
-
-    const float cell_width  = (max_x - min_x) / grid_width;
-    const float cell_height = (max_y - min_y) / grid_height;
-
-    const float scene_x = static_cast<float>(scene_pos.x());
-    const float scene_y = static_cast<float>(scene_pos.y());
-
-    float grid_x = (scene_x - min_x) / cell_width;
-    float grid_y = (scene_y - min_y) / cell_height;
-
-    if (grid_x < 0.f)
-    {
-        grid_x += -1.f;
-    }
-    if (grid_y < 0.f)
-    {
-        grid_y += -1.f;
-    }
-
-    return QPoint(to_int(grid_x), to_int(grid_y));
-}
-
 /*
  * Creates the glider one cell away from the top left corner
  */
@@ -152,146 +113,61 @@ void LifeGrid::create_glider()
     set_cell(3, 3, ALIVE);
 }
 
-void LifeGrid::drawForeground(QPainter *painter, const QRectF &rect)
+void LifeGrid::next_generation()
 {
-    draw_grid(painter);
-}
+    cells_next_iteration.reserve(cells.size());
 
-void LifeGrid::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
-{
-    if(is_painting_cells)
+    /* Kernel we will be updating as the grid is traversed through
+     * 0 1 2
+     * 3 4 5
+     * 6 7 8
+     */
+    CellKernel current_kernel{DEAD};
+
+    // TODO: Handle special cases for grid sizes smaller than 3x3
+
+    for(int y=0; y < grid_height; y++)
     {
-        const auto pos = scene_pos_to_grid_pos(event->scenePos());
-        const bool is_valid = pos.x() >= 0 && pos.x() < grid_width &&
-                              pos.y() >= 0 && pos.y() < grid_height;
-        if(!is_valid)
+        // We know that the left column is dead, so there is no need to populate it.
+        // (Unless we want to wrap the grid around.)
+
+        // If we're not on the top-row, we can grab the cells from the row above
+        if(y > 0)
         {
-            return;
+            current_kernel.cells[1] = get_cell(1, y-1);
+            current_kernel.cells[2] = get_cell(2, y-1);
         }
 
-        const auto cell = get_cell(pos.x(), pos.y());
-        const auto target_state = paint_mode == MAKE_ALIVE ? ALIVE : DEAD;
-        if(cell == target_state)
+        current_kernel.cells[4] = get_cell(1, y);
+        current_kernel.cells[5] = get_cell(2, y);
+
+        // If we're not on the bottom row, we can grab the cells from the row below
+        if(y < grid_height - 1)
         {
-            return;
+            current_kernel.cells[7] = get_cell(1, y+1);
+            current_kernel.cells[8] = get_cell(2, y+1);
         }
 
-        set_cell(pos.x(), pos.y(), target_state);
-        this->update();
-    }
-
-    if(is_dragging_view)
-    {
-        const auto position_diff = event->scenePos() - event->lastScenePos();
-        offset_x += static_cast<float>(position_diff.x());
-        offset_y += static_cast<float>(position_diff.y());
-        this->update();
-    }
-
-}
-
-void LifeGrid::mousePressEvent(QGraphicsSceneMouseEvent *event)
-{
-    if(event->button() == Qt::LeftButton)
-    {
-        const auto pos = scene_pos_to_grid_pos(event->scenePos());
-        const bool is_valid = pos.x() >= 0 && pos.x() < grid_width &&
-                              pos.y() >= 0 && pos.y() < grid_height;
-        if(!is_valid)
+        for(int x=0; x < grid_width; x++)
         {
-            return;
-        }
+            // If this isn't the rightmost column of the grid fill
+            // the rigt kernel column, pretty much the same as above
+            if(x < grid_width - 1) {
+                if(y > 0)
+                {
+                    current_kernel.cells[2] = get_cell(x+1, y-1);
+                }
 
-        is_painting_cells = true;
+                current_kernel.cells[5] = get_cell(x+1, y);
 
-        const auto cell = get_cell(pos.x(), pos.y());
-        const auto target_state = cell == ALIVE ? DEAD : ALIVE;
-        paint_mode = target_state == ALIVE ? MAKE_ALIVE : MAKE_DEAD;
-        set_cell(pos.x(), pos.y(), target_state);
-
-        this->update();
-    }
-    else if(event->button() == Qt::MouseButton::RightButton)
-    {
-        is_dragging_view = true;
-    }
-}
-
-void LifeGrid::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
-{
-    if(event->button() == Qt::MouseButton::LeftButton)
-    {
-        is_painting_cells = false;
-    }
-    else if(event->button() == Qt::MouseButton::RightButton)
-    {
-        is_dragging_view = false;
-    }
-}
-
-void LifeGrid::wheelEvent(QGraphicsSceneWheelEvent *event)
-{
-    zoom += event->delta() / 20.f;
-    if(zoom < 2)
-    {
-        zoom = 2;
-    }
-    else if(zoom > 100)
-    {
-        zoom = 100;
-    }
-
-    // TODO: Center around hovered position
-    this->update();
-
-}
-
-void LifeGrid::draw_grid(QPainter *painter) const
-{
-    painter->setPen(QPen(Qt::black));
-
-    // TODO: Only render the visible portion of the grid
-
-    const float grid_total_width = this->grid_width * this->zoom;
-    const float grid_total_height = this->grid_height * this->zoom;
-
-    // The center of the canvas acts as the origin, so the start position needs to be moved left and up accordingly.
-    // Also, the view offset is summed in afterwards.
-    const float min_x = 0.f - grid_total_width  / 2.f + offset_x;
-    const float min_y = 0.f - grid_total_height / 2.f + offset_y;
-
-    const float max_x = grid_total_width / 2.f + offset_x;
-    const float max_y = grid_total_height / 2.f + offset_y;
-
-    const float cell_width  = (max_x - min_x) / grid_width;
-    const float cell_height = (max_y - min_y) / grid_height;
-
-
-    painter->setBrush(QBrush(Qt::BrushStyle::SolidPattern));
-    size_t cell_index = 0;
-    for(int y = 0; y < grid_height; y++)
-    {
-        const int current_y = to_int(min_y + cell_height * y);
-        for(int x = 0; x < grid_width; x++) {
-            const int current_x = to_int(min_x + cell_width * x);
-            CELL cell = cells[cell_index++];
-            if (cell == ALIVE) {
-               painter->drawRect(current_x, current_y, to_int(cell_width), to_int(cell_height));
+                if(y < grid_height - 1)
+                {
+                    current_kernel.cells[8] = get_cell(x+1, y+1);
+                }
             }
+
+            // Move kernel contents left by one
+            current_kernel.step_right();
         }
-    }
-
-    painter->setPen(QColor(127, 127, 127, 127));
-
-    for(int x = 0; x <= grid_width; x++)
-    {
-        const int line_x = to_int(min_x + cell_width * x);
-        painter->drawLine(line_x, to_int(min_y), line_x, to_int(max_y));
-    }
-
-    for(int y = 0; y <= grid_height; y++)
-    {
-        const int line_y = to_int(min_y + cell_height * y);
-        painter->drawLine(to_int(min_x), line_y, to_int(max_x), line_y);
     }
 }
