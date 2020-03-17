@@ -11,7 +11,7 @@ enum CELL : unsigned char
 
 struct CellKernel
 {
-    std::array<CELL,9> cells{DEAD};
+    std::array<CELL,9> cells;
 
     CellKernel(CELL state_for_all=DEAD);
     CellKernel(std::array<CELL,9> initial_cells);

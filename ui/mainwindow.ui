@@ -61,6 +61,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionTogglePaint"/>
+   <addaction name="actionStep"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionExit">
@@ -77,6 +78,11 @@
    </property>
    <property name="toolTip">
     <string>Toggle cell painting</string>
+   </property>
+  </action>
+  <action name="actionStep">
+   <property name="text">
+    <string>Step</string>
    </property>
   </action>
  </widget>

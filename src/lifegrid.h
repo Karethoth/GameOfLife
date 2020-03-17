@@ -9,7 +9,7 @@
 class LifeGrid
 {
   public:
-    explicit LifeGrid();
+    LifeGrid();
     virtual ~LifeGrid();
 
     int grid_width;
@@ -27,7 +27,8 @@ class LifeGrid
     std::vector<CELL> cells;
 
   private:
-    std::vector<CELL> cells_next_iteration;
+    std::vector<CELL> cells_next_generation;
+    void set_next_generation_cell(const int x, const int y, const CELL state);
 };
 
 #endif // LIFEGRID_H

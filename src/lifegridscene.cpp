@@ -27,12 +27,18 @@ LifeGridScene::LifeGridScene(QObject *_parent) :
     paint_mode{MAKE_ALIVE},
     is_dragging_view{false}
 {
-    resize_grid(10, 10);
+    resize_grid(5,5);
     create_glider();
 }
 
 LifeGridScene::~LifeGridScene()
 {
+}
+
+void LifeGridScene::step_and_update()
+{
+    this->next_generation();
+    this->update();
 }
 
 QPoint LifeGridScene::scene_pos_to_grid_pos(const QPointF &scene_pos) const

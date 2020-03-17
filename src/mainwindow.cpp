@@ -40,7 +40,7 @@ MainWindow::MainWindow(QWidget *parent) :
     speed_selector = std::make_unique<QSpinBox>();
     speed_selector->setRange(0, 100);
     speed_selector->setValue(1);
-    speed_selector->connect(speed_selector.get(), QOverload<int>::of(&QSpinBox::valueChanged), [=](int i) {
+    speed_selector->connect(speed_selector.get(), static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [=](int i) {
         this->on_speed_changed(i);
     });
 
@@ -60,4 +60,9 @@ void MainWindow::on_actionExit_triggered()
 void MainWindow::on_speed_changed(int i)
 {
     QString str = QString::number(i);
+}
+
+void MainWindow::on_actionStep_triggered()
+{
+    life_grid_scene->step_and_update();
 }

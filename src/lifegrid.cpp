@@ -83,6 +83,12 @@ void LifeGrid::set_cell(const int x, const int y, const CELL state)
     cells[index] = state;
 }
 
+void LifeGrid::set_next_generation_cell(const int x, const int y, const CELL state)
+{
+    size_t index = coord_to_index(x, y);
+    cells_next_generation[index] = state;
+}
+
 CELL LifeGrid::get_cell(const int x, const int y) const
 {
     // TODO: if outside of bounds, display error in status
@@ -115,7 +121,7 @@ void LifeGrid::create_glider()
 
 void LifeGrid::next_generation()
 {
-    cells_next_iteration.reserve(cells.size());
+    cells_next_generation.reserve(cells.size());
 
     /* Kernel we will be updating as the grid is traversed through
      * 0 1 2
@@ -166,8 +172,12 @@ void LifeGrid::next_generation()
                 }
             }
 
+            // Update the next generation
+            set_next_generation_cell(x, y, current_kernel.compute_state());
+
             // Move kernel contents left by one
             current_kernel.step_right();
         }
     }
+    cells = cells_next_generation;
 }

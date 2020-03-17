@@ -33,6 +33,8 @@ class LifeGridScene : public LifeGrid, public QGraphicsScene
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
     void wheelEvent(QGraphicsSceneWheelEvent *event) override;
 
+    void step_and_update();
+
   private:
     void draw_grid(QPainter *painter) const;
     QPoint scene_pos_to_grid_pos(const QPointF &scene_pos) const;
