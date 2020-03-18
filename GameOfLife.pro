@@ -37,7 +37,6 @@ HEADERS += \
     src/cellkernel.h \
     src/lifegridscene.h \
     src/lifegrid.h \
-    ui/resizedialog.h \
     src/ui/mainwindow.h \
     src/ui/resizedialog.h
 
