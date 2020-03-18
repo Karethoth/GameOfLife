@@ -1,6 +1,8 @@
 # Game of Life
 *Simple Game of Life for Qt5 with a small twist*
 
+![Screenshot](./screenshots/screenshot.png)
+
 ## The twist
 *Instead of the usual "fetch all neighbours around a cell", this implementation drags a 3x3 matrix around the grid*
 
@@ -50,3 +52,4 @@ doxygen doxygen.conf
 - `ui/` The main window Qt5 form can be found here.
 - `doc/` The documentation, generated when doxygen is run
 - `build/` The build directory
+- `screenshots/` Directory for screenshots

@@ -1,14 +1,14 @@
 #include "lifegridscene.h"
 
-#include <iostream>
-#include <numeric>
-#include <type_traits>
-#include <thread>
-#include <chrono>
-
 #include <QPainter>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsSceneWheelEvent>
+
+#include <type_traits>
+#include <numeric>
+#include <thread>
+#include <chrono>
+
 
 
 // Helper for the float to int casting
@@ -27,13 +27,13 @@ LifeGridScene::LifeGridScene(QObject *_parent) :
     offset_x{0.f},
     offset_y{0.f},
     paint_mode{MAKE_ALIVE},
+    is_painting_cells{false},
     is_dragging_view{false},
     speed{1},
     is_running{false},
     is_painting_enabled{true}
 {
     resize_grid(10,10);
-    create_glider();
 }
 
 LifeGridScene::~LifeGridScene()
@@ -117,7 +117,7 @@ void LifeGridScene::toggle_painting_enabled(bool enabled)
 
 void LifeGridScene::drawForeground(QPainter *painter, const QRectF &rect)
 {
-    draw_grid(painter);
+    draw_grid(painter, rect);
 }
 
 void LifeGridScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
@@ -209,11 +209,9 @@ void LifeGridScene::wheelEvent(QGraphicsSceneWheelEvent *event)
 
 }
 
-void LifeGridScene::draw_grid(QPainter *painter) const
+void LifeGridScene::draw_grid(QPainter *painter, const QRectF &rect) const
 {
     painter->setPen(QPen(Qt::black));
-
-    // TODO: Only render the visible portion of the grid
 
     const float grid_total_width = this->grid_width * this->zoom;
     const float grid_total_height = this->grid_height * this->zoom;
@@ -229,15 +227,55 @@ void LifeGridScene::draw_grid(QPainter *painter) const
     const float cell_width  = (max_x - min_x) / grid_width;
     const float cell_height = (max_y - min_y) / grid_height;
 
+    // Grab the displayed area
+    const float scene_width  = static_cast<float>(rect.width());
+    const float scene_height = static_cast<float>(rect.height());
 
+    // Some safety margin to render content slightly outside of the display
+    const float display_margin  = 2 * zoom;
+
+    // Calculate limits around the visible area.
+    // These are to limit what should be rendered and what should be ignored.
+    const float displayed_min_x = 0 - scene_width  / 2 - display_margin;
+    const float displayed_min_y = 0 - scene_height / 2 - display_margin;
+    const float displayed_max_x = displayed_min_x + scene_width  + display_margin * 2;
+    const float displayed_max_y = displayed_min_y + scene_height + display_margin * 2;
+
+
+    // Draw live cells
     painter->setBrush(QBrush(Qt::BrushStyle::SolidPattern));
     size_t cell_index = 0;
     for(int y = 0; y < grid_height; y++)
     {
         const int current_y = to_int(min_y + cell_height * y);
+
+        // If this row isn't displayed, skip it
+        if(current_y < displayed_min_y)
+        {
+            cell_index += static_cast<size_t>(grid_width);
+            continue;
+        }
+        else if(current_y > displayed_max_y)
+        {
+            break;
+        }
+
         for(int x = 0; x < grid_width; x++)
         {
             const int current_x = to_int(min_x + cell_width * x);
+
+            // If this column isn't displayed, skip it
+            if(current_x < displayed_min_x)
+            {
+                cell_index += 1;
+                continue;
+            }
+            else if(current_x > displayed_max_x)
+            {
+                cell_index += 1;
+                continue;
+            }
+
             CELL cell = cells[cell_index++];
             if (cell == ALIVE)
             {
@@ -246,17 +284,49 @@ void LifeGridScene::draw_grid(QPainter *painter) const
         }
     }
 
+    // Draw the grid
     painter->setPen(QColor(127, 127, 127, 127));
-
     for(int x = 0; x <= grid_width; x++)
     {
         const int line_x = to_int(min_x + cell_width * x);
-        painter->drawLine(line_x, to_int(min_y), line_x, to_int(max_y));
+
+        // If this column isn't displayed, skip it
+        if(line_x < displayed_min_x)
+        {
+            continue;
+        }
+        else if(line_x > displayed_max_x)
+        {
+            break;
+        }
+
+        painter->drawLine(
+            line_x,
+            to_int(std::max(min_y, displayed_min_y)),
+            line_x,
+            to_int(std::min(max_y, displayed_max_y))
+        );
     }
 
     for(int y = 0; y <= grid_height; y++)
     {
         const int line_y = to_int(min_y + cell_height * y);
-        painter->drawLine(to_int(min_x), line_y, to_int(max_x), line_y);
+
+        // If this row isn't displayed, skip it
+        if(line_y < displayed_min_y)
+        {
+            continue;
+        }
+        else if(line_y > displayed_max_y)
+        {
+            break;
+        }
+
+        painter->drawLine(
+            to_int(std::max(min_x, displayed_min_x)),
+            line_y,
+            to_int(std::min(max_x, displayed_max_x)),
+            line_y
+        );
     }
 }

@@ -34,18 +34,24 @@ CELL CellKernel::compute_state()
 {
     const CELL current_state = cells[4];
 
-    // Calculate the total number of cells alive.
-    // To account for the current state, start from -1 if the cell is alive at the moment
+    /*
+     * Calculate the total number of cells alive.
+     *
+     * To account for the current state of the grid cell ([4]),
+     * start from -1 if the cell is alive at the moment.
+     */
     int initial_neighbours= current_state == ALIVE ? -1 : 0;
     const auto neighbours = std::accumulate(cells.begin(), cells.end(), initial_neighbours);
 
     if (current_state == ALIVE)
     {
-        if(neighbours < 2) {
+        if(neighbours < 2)
+        {
             return DEAD;
         }
 
-        if(neighbours > 3) {
+        else if(neighbours > 3)
+        {
             return DEAD;
         }
 

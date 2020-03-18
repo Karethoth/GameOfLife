@@ -46,6 +46,10 @@ class LifeGridScene : public LifeGrid, public QGraphicsScene
      */
     float offset_y;
 
+    /*!
+     * \brief Run the simulation automatically or stop it
+     * \param ruun Whether to run or stop
+     */
     void run(bool run);
 
     void drawForeground(QPainter *painter, const QRectF &rect) override;
@@ -78,7 +82,7 @@ class LifeGridScene : public LifeGrid, public QGraphicsScene
      * \brief Renders the grid
      * \param painter Passed in by Qt upon an update
      */
-    void draw_grid(QPainter *painter) const;
+    void draw_grid(QPainter *painter, const QRectF &rect) const;
 
     /*!
      * \brief Calculates the relevant grid position when an UI event happens
