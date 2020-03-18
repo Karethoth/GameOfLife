@@ -6,8 +6,8 @@
 #include <vector>
 
 /*!
- * \brief Class for basic management of the whole GoL grid
- * \details Handles the basic modification of the grid
+ * \brief Class for basic management of the whole Game of Life grid
+ * \details Handles the basic modifications of the grid
  */
 class LifeGrid
 {
@@ -15,7 +15,8 @@ class LifeGrid
 
     /*!
      * \brief Grid constructor
-     * \param size_n Square grid size. Will create size_n * size_n grid.
+     * \details  Will create a size_n * size_n grid
+     * \param size_n The length of a side for a square grid. Must be 3 or more
      */
     LifeGrid(int size_n=5);
     virtual ~LifeGrid();

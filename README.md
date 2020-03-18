@@ -6,8 +6,16 @@
 ## The twist
 *Instead of the usual "fetch all neighbours around a cell", this implementation drags a 3x3 matrix around the grid*
 
+## Features
+- Resizable grid
+- View dragging (hold the right mouse button down)
+- View zooming (spin the scroll wheel)
+- Adjustable max speed for the automatic generation stepping
+- Toggleable grid wrapping
+  - When enabled, have a glider hit the border and watch as it appears from the opposite side
+
 ## Requirements
-- Basic C++ build tools
+- Basic C++17 build tools
 - Qt5 Development tools
 
 ## Compiling on Ubuntu
@@ -33,6 +41,8 @@ make
 ```
 
 Alternatively you can just open the project file in Qt Creator and use that.
+
+If there are any problems, please make sure you have a modern, C++17 compatible compiler. Tested with GCC 9.2.1.
 
 ### Creating documentation
 #### Install doxygen (and optionally graphviz for the sweet graphs)

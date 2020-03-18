@@ -12,6 +12,12 @@ class ResizeDialog : public QDialog
     Q_OBJECT
 
 public:
+    /*!
+     * \brief Constructor
+     * \param parent A pointer to the parent QWidget
+     * \param width The initial value for the width input
+     * \param height The initial value for the height input
+     */
     explicit ResizeDialog(QWidget *parent, int width, int height);
     ~ResizeDialog();
 
@@ -27,6 +33,9 @@ private slots:
 private:
     Ui::ResizeDialog *ui;
 
+    /*!
+     * \brief When true, the width and the height are bound together
+     */
     bool is_grid_size_n_n_constrained;
 };
 

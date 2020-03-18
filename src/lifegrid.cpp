@@ -1,12 +1,13 @@
 #include "lifegrid.h"
 
+#include <limits>
 #include <numeric>
+#include <exception>
 #include <type_traits>
 
 #include <QPainter>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsSceneWheelEvent>
-
 
 // Helper for the float to int casting
 template <
@@ -23,6 +24,10 @@ LifeGrid::LifeGrid(int size_n) :
     grid_height{size_n},
     wrap_grid{false}
 {
+    if(grid_width < 3 || grid_height < 3)
+    {
+        throw std::out_of_range("3x3 is the smallest supported grid size");
+    }
     cells = std::vector<CELL>(size_n * size_n, DEAD);
     resize_grid(size_n, size_n);
 }
@@ -72,9 +77,9 @@ void LifeGrid::resize_grid(int new_width, int new_height)
     const size_t total_cells_before = static_cast<size_t>(grid_width) * static_cast<size_t>(grid_height);
     if (total_cells < total_cells_before)
     {
+        // TODO: Copy old contents into the new grid
         grid_width = new_width;
         grid_height = new_height;
-        // TODO: Copy old contents into the new grid
         cells.resize(total_cells);
     }
     else

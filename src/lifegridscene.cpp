@@ -22,6 +22,7 @@ int to_int(T f)
 }
 
 LifeGridScene::LifeGridScene(QObject *_parent) :
+    LifeGrid{14},
     QGraphicsScene(_parent),
     zoom{20},
     offset_x{0.f},
@@ -33,7 +34,6 @@ LifeGridScene::LifeGridScene(QObject *_parent) :
     is_running{false},
     is_painting_enabled{true}
 {
-    resize_grid(10,10);
 }
 
 LifeGridScene::~LifeGridScene()
@@ -42,13 +42,13 @@ LifeGridScene::~LifeGridScene()
 
 QPoint LifeGridScene::scene_pos_to_grid_pos(const QPointF &scene_pos) const
 {
-    const float grid_total_width = this->grid_width * this->zoom;
+    const float grid_total_width  = this->grid_width  * this->zoom;
     const float grid_total_height = this->grid_height * this->zoom;
 
     const float min_x = 0.f - grid_total_width  / 2.f + offset_x;
     const float min_y = 0.f - grid_total_height / 2.f + offset_y;
 
-    const float max_x = grid_total_width / 2.f + offset_x;
+    const float max_x = grid_total_width  / 2.f + offset_x;
     const float max_y = grid_total_height / 2.f + offset_y;
 
     const float cell_width  = (max_x - min_x) / grid_width;
@@ -86,12 +86,13 @@ void LifeGridScene::run(bool run)
                 this->next_generation();
                 this->update();
 
-                const auto delay = std::chrono::milliseconds( 1000 / this->speed);
+                const auto delay = std::chrono::milliseconds(1000 / this->speed);
                 std::this_thread::sleep_for(std::chrono::milliseconds(delay));
             }
         });
     }
-    else {
+    else
+    {
         update_thread.join();
     }
 }
@@ -125,6 +126,8 @@ void LifeGridScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     if(is_painting_cells)
     {
         const auto pos = scene_pos_to_grid_pos(event->scenePos());
+
+        // Check if the mouse is hovering over the grid
         const bool is_valid = pos.x() >= 0 && pos.x() < grid_width &&
                               pos.y() >= 0 && pos.y() < grid_height;
         if(!is_valid)
@@ -132,6 +135,7 @@ void LifeGridScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
             return;
         }
 
+        // Check if the cell needs to be updated
         const auto cell = get_cell(pos.x(), pos.y());
         const auto target_state = paint_mode == MAKE_ALIVE ? ALIVE : DEAD;
         if(cell == target_state)
@@ -158,6 +162,8 @@ void LifeGridScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
     if(event->button() == Qt::LeftButton)
     {
         const auto pos = scene_pos_to_grid_pos(event->scenePos());
+
+        // Ignore if the mouse is outside of the grid, or if painting is disabled
         const bool is_valid = pos.x() >= 0 && pos.x() < grid_width &&
                               pos.y() >= 0 && pos.y() < grid_height;
         if(!is_valid || !is_painting_enabled)
@@ -167,6 +173,8 @@ void LifeGridScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
         is_painting_cells = true;
 
+        // Save paint_mode reverse to the cell's current state
+        // and update the cell
         const auto cell = get_cell(pos.x(), pos.y());
         const auto target_state = cell == ALIVE ? DEAD : ALIVE;
         paint_mode = target_state == ALIVE ? MAKE_ALIVE : MAKE_DEAD;
@@ -194,7 +202,9 @@ void LifeGridScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 void LifeGridScene::wheelEvent(QGraphicsSceneWheelEvent *event)
 {
+    const auto old_zoom = zoom;
     zoom += event->delta() / 20.f;
+
     if(zoom < 2)
     {
         zoom = 2;
@@ -204,7 +214,16 @@ void LifeGridScene::wheelEvent(QGraphicsSceneWheelEvent *event)
         zoom = 100;
     }
 
-    // TODO: Center around hovered position
+    // If the zoom was changed, scale the view offsets accordingly.
+    // This will keep the grid "still" when zooming in and out.
+    if(zoom != old_zoom)
+    {
+        const auto zoom_ratio = static_cast<float>(zoom) / (old_zoom);
+        offset_x *= zoom_ratio;
+        offset_y *= zoom_ratio;
+    }
+
+
     this->update();
 
 }
@@ -213,7 +232,7 @@ void LifeGridScene::draw_grid(QPainter *painter, const QRectF &rect) const
 {
     painter->setPen(QPen(Qt::black));
 
-    const float grid_total_width = this->grid_width * this->zoom;
+    const float grid_total_width  = this->grid_width  * this->zoom;
     const float grid_total_height = this->grid_height * this->zoom;
 
     // The center of the canvas acts as the origin, so the start position needs to be moved left and up accordingly.
@@ -221,17 +240,17 @@ void LifeGridScene::draw_grid(QPainter *painter, const QRectF &rect) const
     const float min_x = 0.f - grid_total_width  / 2.f + offset_x;
     const float min_y = 0.f - grid_total_height / 2.f + offset_y;
 
-    const float max_x = grid_total_width / 2.f + offset_x;
+    const float max_x = grid_total_width  / 2.f + offset_x;
     const float max_y = grid_total_height / 2.f + offset_y;
 
-    const float cell_width  = (max_x - min_x) / grid_width;
-    const float cell_height = (max_y - min_y) / grid_height;
+    const float cell_width  = zoom;
+    const float cell_height = zoom;
 
     // Grab the displayed area
     const float scene_width  = static_cast<float>(rect.width());
     const float scene_height = static_cast<float>(rect.height());
 
-    // Some safety margin to render content slightly outside of the display
+    // A safety margin to render content slightly outside of the display
     const float display_margin  = 2 * zoom;
 
     // Calculate limits around the visible area.
@@ -242,7 +261,7 @@ void LifeGridScene::draw_grid(QPainter *painter, const QRectF &rect) const
     const float displayed_max_y = displayed_min_y + scene_height + display_margin * 2;
 
 
-    // Draw live cells
+    // Draw the live cells
     painter->setBrush(QBrush(Qt::BrushStyle::SolidPattern));
     size_t cell_index = 0;
     for(int y = 0; y < grid_height; y++)

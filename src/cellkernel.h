@@ -4,7 +4,7 @@
 #include <array>
 
 /*!
- * @brief The state of the cell, either DEAD or ALIVE
+ * @brief The state of a cell, either DEAD or ALIVE
  */
 enum CELL : unsigned char
 {
