@@ -7,6 +7,9 @@ namespace Ui {
 class ResizeDialog;
 }
 
+/*!
+ * \brief The grid resize dialog
+ */
 class ResizeDialog : public QDialog
 {
     Q_OBJECT

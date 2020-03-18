@@ -44,7 +44,7 @@ Alternatively you can just open the project file in Qt Creator and use that.
 
 If there are any problems, please make sure you have a modern, C++17 compatible compiler. Tested with GCC 9.2.1.
 
-### Creating documentation
+### Creating the documentation
 #### Install doxygen (and optionally graphviz for the sweet graphs)
 ```
 sudo apt install doxygen

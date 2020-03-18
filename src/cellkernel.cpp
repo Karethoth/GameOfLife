@@ -32,14 +32,14 @@ void CellKernel::step_right()
 
 CELL CellKernel::compute_state()
 {
-    const CELL current_state = cells[4];
-
     /*
-     * Calculate the total number of cells alive.
+     * Calculate the total number of neighbour cells alive.
      *
      * To account for the current state of the grid cell ([4]),
      * start from -1 if the cell is alive at the moment.
      */
+    const CELL current_state = cells[4];
+
     int initial_neighbours= current_state == ALIVE ? -1 : 0;
     const auto neighbours = std::accumulate(cells.begin(), cells.end(), initial_neighbours);
 

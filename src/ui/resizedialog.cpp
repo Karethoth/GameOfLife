@@ -7,11 +7,13 @@ ResizeDialog::ResizeDialog(QWidget *parent, int width, int height) :
 {
     ui->setupUi(this);
 
-    new_width = width;
+    new_width  = width;
     new_height = height;
 
+    // If the current grid is a square, lock the inputs together by default
     is_grid_size_n_n_constrained = width == height;
 
+    // Use the given values in the dialog
     auto *width_input     = this->findChild<QObject*>({"new_width"});
     auto *height_input    = this->findChild<QObject*>({"new_height"});
     auto *lock_n_n_button = this->findChild<QObject*>({"lock_n_n"});
@@ -25,6 +27,7 @@ ResizeDialog::ResizeDialog(QWidget *parent, int width, int height) :
     {
         QMetaObject::invokeMethod(height_input, "setValue", Q_ARG(int, height));
     }
+
     if(lock_n_n_button)
     {
         QMetaObject::invokeMethod(lock_n_n_button, "setChecked", Q_ARG(bool, is_grid_size_n_n_constrained));
@@ -39,6 +42,8 @@ ResizeDialog::~ResizeDialog()
 void ResizeDialog::on_new_width_valueChanged(int arg1)
 {
     new_width = arg1;
+
+    // If the inputs are locked together, update the height input as well
     if(is_grid_size_n_n_constrained)
     {
         auto *height_input = this->findChild<QObject*>({"new_height"});
@@ -52,6 +57,8 @@ void ResizeDialog::on_new_width_valueChanged(int arg1)
 void ResizeDialog::on_new_height_valueChanged(int arg1)
 {
     new_height = arg1;
+
+    // If the inputs are locked together, update the width input as well
     if(is_grid_size_n_n_constrained)
     {
         auto *width_input = this->findChild<QObject*>({"new_width"});

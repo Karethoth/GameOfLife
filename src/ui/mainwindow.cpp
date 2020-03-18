@@ -1,7 +1,3 @@
-/*! \file
- * \brief This file manages the UI
- */
-
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "resizedialog.h"
@@ -115,9 +111,9 @@ void MainWindow::on_actionTogglePaint_toggled(bool arg1)
 void MainWindow::on_actionResize_triggered()
 {
     resize_dialog = std::make_unique<ResizeDialog>(
-                this,
-                life_grid_scene->get_grid_width(),
-                life_grid_scene->get_grid_height()
+        this,
+        life_grid_scene->get_grid_width(),
+        life_grid_scene->get_grid_height()
     );
 
     QObject::connect(resize_dialog.get(), &QDialog::accepted, this, &MainWindow::on_resize_dialog_accepted);

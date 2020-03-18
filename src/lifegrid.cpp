@@ -9,16 +9,6 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsSceneWheelEvent>
 
-// Helper for the float to int casting
-template <
-    typename T,
-    typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type
->
-int to_int(T f)
-{
-    return static_cast<int>(f);
-}
-
 LifeGrid::LifeGrid(int size_n) :
     grid_width{size_n},
     grid_height{size_n},
@@ -252,7 +242,7 @@ void LifeGrid::next_generation()
                 }
             }
 
-            // Update the next generation
+            // Update the next generation grid
             const auto new_state = current_kernel.compute_state();
             set_next_generation_cell(x, y, new_state);
 
