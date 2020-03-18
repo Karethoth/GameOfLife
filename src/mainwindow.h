@@ -5,6 +5,7 @@
 #include <QHBoxLayout>
 #include <QMainWindow>
 #include <QSpinBox>
+#include <QLabel>
 
 #include <memory>
 
@@ -47,6 +48,7 @@ private:
 
     std::unique_ptr<QGraphicsView> graphics_view;
     std::unique_ptr<QHBoxLayout> hbox_layout;
+    std::unique_ptr<QLabel> speed_selector_label;
     std::unique_ptr<QSpinBox> speed_selector;
     std::unique_ptr<LifeGridScene> life_grid_scene;
     std::unique_ptr<ResizeDialog> resize_dialog;

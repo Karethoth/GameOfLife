@@ -14,6 +14,11 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    // Don't allow moving or hiding the main toolbar
+    ui->mainToolBar->setFloatable(false);
+    ui->mainToolBar->setMovable(false);
+    ui->mainToolBar->setContextMenuPolicy(Qt::PreventContextMenu);
+
     // Create the canvas
     graphics_view = std::make_unique<QGraphicsView>(this);
     hbox_layout = std::make_unique<QHBoxLayout>(this);
@@ -27,10 +32,10 @@ MainWindow::MainWindow(QWidget *parent) :
     life_grid_scene = std::make_unique<LifeGridScene>(this);
     graphics_view->setScene(life_grid_scene.get());
 
-
     // Ensure painting is toggled on by default
     for(auto action : ui->mainToolBar->actions())
     {
+        const auto name = action->objectName();
         if (action->objectName() == "actionTogglePaint")
         {
             action->setChecked(true);
@@ -39,7 +44,15 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     // Create the speed selector with the initial value and connect it back
-    // and connect it back
+
+
+    // First a label for it
+    ui->mainToolBar->addSeparator();
+    speed_selector_label = std::make_unique<QLabel>(ui->mainToolBar);
+    speed_selector_label->setText("Max iterations/s: ");
+    ui->mainToolBar->addWidget(speed_selector_label.get());
+
+    // And then the selector itself
     speed_selector = std::make_unique<QSpinBox>();
     speed_selector->setRange(1, 100);
     speed_selector->setValue(1);

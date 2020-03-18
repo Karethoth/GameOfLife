@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>504</width>
-    <height>348</height>
+    <width>600</width>
+    <height>400</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -41,7 +41,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>504</width>
+     <width>600</width>
      <height>22</height>
     </rect>
    </property>
@@ -69,6 +69,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionTogglePaint"/>
+   <addaction name="separator"/>
    <addaction name="actionWrap_Grid"/>
    <addaction name="separator"/>
    <addaction name="actionStep"/>
