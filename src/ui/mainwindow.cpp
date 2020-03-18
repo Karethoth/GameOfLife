@@ -1,6 +1,10 @@
+/*! \file
+ * \brief This file manages the UI
+ */
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "ui/resizedialog.h"
+#include "resizedialog.h"
 
 #include <QLayout>
 #include <QGraphicsView>
@@ -22,7 +26,6 @@ MainWindow::MainWindow(QWidget *parent) :
     // Create the canvas
     graphics_view = std::make_unique<QGraphicsView>(this);
     hbox_layout = std::make_unique<QHBoxLayout>(this);
-
     hbox_layout->addWidget(graphics_view.get());
 
     auto contentWidget = new QWidget();
@@ -32,19 +35,8 @@ MainWindow::MainWindow(QWidget *parent) :
     life_grid_scene = std::make_unique<LifeGridScene>(this);
     graphics_view->setScene(life_grid_scene.get());
 
-    // Ensure painting is toggled on by default
-    for(auto action : ui->mainToolBar->actions())
-    {
-        const auto name = action->objectName();
-        if (action->objectName() == "actionTogglePaint")
-        {
-            action->setChecked(true);
-        }
-    }
-
 
     // Create the speed selector with the initial value and connect it back
-
 
     // First a label for it
     ui->mainToolBar->addSeparator();
@@ -61,6 +53,16 @@ MainWindow::MainWindow(QWidget *parent) :
     });
 
     ui->mainToolBar->addWidget(speed_selector.get());
+
+    // Finally, ensure painting is toggled on by default
+    for(auto action : ui->mainToolBar->actions())
+    {
+        const auto name = action->objectName();
+        if (action->objectName() == "actionTogglePaint")
+        {
+            action->setChecked(true);
+        }
+    }
 }
 
 MainWindow::~MainWindow()

@@ -35,9 +35,9 @@ make
 Alternatively you can just open the project file in Qt Creator and use that.
 
 ### Creating documentation
-#### Install doxygen (and graphviz for the sweet graphs)
+#### Install doxygen (and optionally graphviz for the sweet graphs)
 ```
-sudo apt install 
+sudo apt install doxygen
 sudo apt install graphviz
 ```
 
@@ -45,11 +45,13 @@ sudo apt install graphviz
 ```
 doxygen doxygen.conf
 ```
+*The documentation main page is located at doc/html/index.html*
 
 ## The directory structure
 - `src/` All of the code, excluding the tests.
+- `src/ui/` The code for the UI elements.
 - `tests/` The tests.
-- `ui/` The main window Qt5 form can be found here.
-- `doc/` The documentation, generated when doxygen is run
-- `build/` The build directory
-- `screenshots/` Directory for screenshots
+- `ui/` The Qt Forms can be found in here.
+- `doc/` The documentation, generated when doxygen is run.
+- `build/` The build directory.
+- `screenshots/` A directory for screenshots.

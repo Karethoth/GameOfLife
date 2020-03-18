@@ -35,6 +35,10 @@ void unit_test_report(int errors, std::string test_unit_name)
 #define TEST_FUNC_REPORT(func, expected) test_report(func(), expected, #func)
 #define UNIT_TEST_REPORT(func) cout << "Testing unit " << #func << endl; unit_test_report(func(), #func)
 
+
+/*
+ * The tests for CellKernel::compute_state
+ */
 int test_kernel_compute_state()
 {
 	int errors = 0;
@@ -143,6 +147,10 @@ int test_kernel_compute_state()
 	return errors;
 }
 
+
+/*
+ * The tests for CellKernel::step_right()
+ */
 int test_kernel_step_right()
 {
 	int errors = 0;

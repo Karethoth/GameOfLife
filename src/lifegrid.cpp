@@ -23,7 +23,7 @@ LifeGrid::LifeGrid(int size_n) :
     grid_height{size_n},
     wrap_grid{false}
 {
-    cells = std::vector<CELL>(size_n*size_n, DEAD);
+    cells = std::vector<CELL>(size_n * size_n, DEAD);
     resize_grid(size_n, size_n);
 }
 

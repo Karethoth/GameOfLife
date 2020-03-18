@@ -27,21 +27,22 @@ CONFIG += c++17
 
 SOURCES += \
     src/main.cpp \
-    src/mainwindow.cpp \
     src/cellkernel.cpp \
     src/lifegridscene.cpp \
     src/lifegrid.cpp \
-    ui/resizedialog.cpp
+    src/ui/mainwindow.cpp \
+    src/ui/resizedialog.cpp
 
 HEADERS += \
-    src/mainwindow.h \
     src/cellkernel.h \
     src/lifegridscene.h \
     src/lifegrid.h \
-    ui/resizedialog.h
+    ui/resizedialog.h \
+    src/ui/mainwindow.h \
+    src/ui/resizedialog.h
 
 FORMS += \
-        ui/mainwindow.ui \
+    ui/mainwindow.ui \
     ui/resizedialog.ui
 
 # Default rules for deployment.
